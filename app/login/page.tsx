@@ -1,13 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
 export default function Login() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+
+  // Проверяем, авторизован ли пользователь при загрузке
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        // Если уже авторизован — сразу на онбординг
+        router.push('/onboarding')
+      }
+    }
+    checkUser()
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -37,6 +51,7 @@ export default function Login() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">🎯 Карьерный радар</h1>
           <p className="text-slate-600">Войдите или зарегистрируйтесь через email</p>
+          <p className="text-sm text-slate-500 mt-2">Без пароля — просто клик по ссылке</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -60,7 +75,7 @@ export default function Login() {
             disabled={loading}
             className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-slate-400"
           >
-            {loading ? 'Отправка...' : '🔗 Получить ссылку для входа'}
+            {loading ? 'Отправка...' : ' Получить ссылку для входа'}
           </button>
         </form>
 
