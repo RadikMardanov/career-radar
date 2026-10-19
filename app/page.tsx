@@ -11,7 +11,7 @@ export default function Home() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <a
-            href="/onboarding"
+            href="/login"
             className="bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow-lg"
           >
             🎯 Получить первый отчёт бесплатно
@@ -124,7 +124,7 @@ export default function Home() {
             
             <div className="mb-6 p-4 bg-blue-50 rounded-lg">
               <p className="text-slate-700">
-                <strong>Доброе утро, Радик!</strong><br />
+                <strong>Доброе утро!</strong><br />
                 За ночь найдено <strong>18 новых вакансий</strong>. Отсеяно по вашим фильтрам: 12. Показываем топ-6.
               </p>
             </div>
@@ -143,7 +143,7 @@ export default function Home() {
                   </span>
                 </div>
                 <p className="text-slate-700 mb-2">
-                  💰 150 000 – 200 000 ₽ на руки &nbsp;|&nbsp;  Удалённо
+                  💰 150 000 – 200 000 ₽ на руки &nbsp;|&nbsp; 🏠 Удалённо
                 </p>
                 <div className="bg-slate-50 p-3 rounded mb-3">
                   <p className="text-sm text-slate-600 mb-1 font-semibold">💡 Почему подходит:</p>
@@ -218,7 +218,7 @@ export default function Home() {
                 <span className="text-slate-700">До 5 избранных вакансий</span>
               </li>
             </ul>
-            <a href="/onboarding" className="block text-center bg-slate-100 text-slate-700 py-3 rounded-lg font-semibold hover:bg-slate-200 transition">
+            <a href="/login" className="block text-center bg-slate-100 text-slate-700 py-3 rounded-lg font-semibold hover:bg-slate-200 transition">
               Начать бесплатно
             </a>
           </div>
@@ -261,7 +261,7 @@ export default function Home() {
                 <span className="text-slate-700">До 10 избранных вакансий</span>
               </li>
             </ul>
-            <a href="/onboarding" className="block text-center bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+            <a href="/login" className="block text-center bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
               Попробовать бесплатно
             </a>
           </div>
@@ -306,7 +306,7 @@ export default function Home() {
                 <span className="text-slate-700">Приоритетная поддержка</span>
               </li>
             </ul>
-            <a href="/onboarding" className="block text-center bg-slate-100 text-slate-700 py-3 rounded-lg font-semibold hover:bg-slate-200 transition">
+            <a href="/login" className="block text-center bg-slate-100 text-slate-700 py-3 rounded-lg font-semibold hover:bg-slate-200 transition">
               Начать с Pro Trial
             </a>
           </div>
@@ -328,14 +328,14 @@ export default function Home() {
               </p>
             </div>
             <div className="text-center">
-              <div className="text-4xl mb-4">⚡</div>
+              <div className="text-4xl mb-4"></div>
               <h3 className="text-lg font-semibold mb-2">5 источников вакансий</h3>
               <p className="text-slate-600 text-sm">
                 hh.ru, SuperJob, Хабр Карьера, Rabota.ru, trudvsem.ru — всё в одном отчёте
               </p>
             </div>
             <div className="text-center">
-              <div className="text-4xl mb-4">🎯</div>
+              <div className="text-4xl mb-4"></div>
               <h3 className="text-lg font-semibold mb-2">Только релевантные вакансии</h3>
               <p className="text-slate-600 text-sm">
                 Стоп-слова, фильтры по зарплате, формату, опыту — вы контролируете выдачу
@@ -354,7 +354,7 @@ export default function Home() {
           Получите первый персональный отчёт уже завтра утром. 3 дня полного доступа бесплатно.
         </p>
         <a
-          href="/onboarding"
+          href="/login"
           className="inline-block bg-primary text-white px-10 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition shadow-lg"
         >
           🚀 Начать бесплатно
