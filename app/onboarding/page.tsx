@@ -101,7 +101,6 @@ export default function Onboarding() {
 
       if (error) throw error
 
-      // Переход к следующему шагу (пока заглушка)
       alert('Данные сохранены! В следующих шагах добавим остальные поля.')
       router.push('/dashboard')
     } catch (err: any) {
@@ -112,10 +111,10 @@ export default function Onboarding() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12 px-4">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-8 px-4 sm:py-12">
       <div className="max-w-3xl mx-auto">
         {/* Прогресс-бар */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-slate-600">Шаг {step} из {totalSteps}</span>
             <span className="text-sm text-slate-600">{Math.round((step / totalSteps) * 100)}%</span>
@@ -129,35 +128,36 @@ export default function Onboarding() {
         </div>
 
         {/* Карточка формы */}
-        <div className="bg-white rounded-xl shadow-lg p-8 border border-slate-200">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
+        <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 border border-slate-200">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
             Настройте ваш поиск работы
           </h1>
-          <p className="text-slate-600 mb-8">
+          <p className="text-slate-600 mb-6 sm:mb-8">
             Заполните профиль, чтобы мы могли находить только подходящие вакансии
           </p>
 
           {/* ШАГ 1: Желаемая должность */}
           {step === 1 && (
             <div>
-              <h2 className="text-2xl font-semibold mb-4">1. Кем вы хотите работать?</h2>
-              <p className="text-slate-600 mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">1. Кем вы хотите работать?</h2>
+              <p className="text-slate-600 mb-4 sm:mb-6">
                 Укажите желаемые должности (можно несколько)
               </p>
 
-              <div className="flex gap-2 mb-4">
+              {/* ИСПРАВЛЕНО: адаптивная верстка для мобильных */}
+              <div className="flex flex-col sm:flex-row gap-2 mb-4 w-full">
                 <input
                   type="text"
                   value={roleInput}
                   onChange={(e) => setRoleInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRole())}
                   placeholder="Например: Менеджер проектов"
-                  className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                  className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none w-full"
                 />
                 <button
                   type="button"
                   onClick={addRole}
-                  className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                  className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition w-full sm:w-auto"
                 >
                   Добавить
                 </button>
@@ -174,7 +174,7 @@ export default function Onboarding() {
                       <button
                         type="button"
                         onClick={() => removeRole(role)}
-                        className="text-primary hover:text-red-600"
+                        className="text-primary hover:text-red-600 font-bold"
                       >
                         ×
                       </button>
@@ -188,8 +188,8 @@ export default function Onboarding() {
           {/* ШАГ 2: Зарплата */}
           {step === 2 && (
             <div>
-              <h2 className="text-2xl font-semibold mb-4">2. Желаемая зарплата</h2>
-              <p className="text-slate-600 mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">2. Желаемая зарплата</h2>
+              <p className="text-slate-600 mb-4 sm:mb-6">
                 Укажите минимальную зарплату и формат
               </p>
 
@@ -211,11 +211,11 @@ export default function Onboarding() {
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Формат зарплаты
                   </label>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, salary_type: 'net' })}
-                      className={`py-3 px-4 rounded-lg border-2 transition ${
+                      className={`py-3 px-4 rounded-lg border-2 transition text-sm sm:text-base ${
                         formData.salary_type === 'net'
                           ? 'border-primary bg-blue-50 text-primary'
                           : 'border-slate-200 hover:border-slate-300'
@@ -226,7 +226,7 @@ export default function Onboarding() {
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, salary_type: 'gross' })}
-                      className={`py-3 px-4 rounded-lg border-2 transition ${
+                      className={`py-3 px-4 rounded-lg border-2 transition text-sm sm:text-base ${
                         formData.salary_type === 'gross'
                           ? 'border-primary bg-blue-50 text-primary'
                           : 'border-slate-200 hover:border-slate-300'
@@ -243,16 +243,16 @@ export default function Onboarding() {
           {/* ШАГ 3: Формат работы */}
           {step === 3 && (
             <div>
-              <h2 className="text-2xl font-semibold mb-4">3. Формат работы</h2>
-              <p className="text-slate-600 mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">3. Формат работы</h2>
+              <p className="text-slate-600 mb-4 sm:mb-6">
                 Выберите предпочтительный формат
               </p>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {[
-                  { value: 'remote', label: ' Удалённо', desc: 'Полностью удаленная работа' },
+                  { value: 'remote', label: '🏠 Удалённо', desc: 'Полностью удаленная работа' },
                   { value: 'hybrid', label: '🔄 Гибрид', desc: 'Частично офис, частично удаленно' },
-                  { value: 'office', label: ' Офис', desc: 'Работа в офисе' },
+                  { value: 'office', label: '🏢 Офис', desc: 'Работа в офисе' },
                   { value: 'any', label: '✨ Любой', desc: 'Не имеет значения' },
                 ].map((option) => (
                   <button
@@ -265,7 +265,7 @@ export default function Onboarding() {
                         : 'border-slate-200 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-semibold text-lg mb-1">{option.label}</div>
+                    <div className="font-semibold text-base sm:text-lg mb-1">{option.label}</div>
                     <div className="text-sm text-slate-600">{option.desc}</div>
                   </button>
                 ))}
@@ -276,24 +276,25 @@ export default function Onboarding() {
           {/* ШАГ 4: География */}
           {step === 4 && (
             <div>
-              <h2 className="text-2xl font-semibold mb-4">4. География</h2>
-              <p className="text-slate-600 mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">4. География</h2>
+              <p className="text-slate-600 mb-4 sm:mb-6">
                 Укажите предпочтительные города (можно несколько)
               </p>
 
-              <div className="flex gap-2 mb-4">
+              {/* ИСПРАВЛЕНО: адаптивная верстка для мобильных */}
+              <div className="flex flex-col sm:flex-row gap-2 mb-4 w-full">
                 <input
                   type="text"
                   value={cityInput}
                   onChange={(e) => setCityInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCity())}
                   placeholder="Например: Казань"
-                  className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                  className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none w-full"
                 />
                 <button
                   type="button"
                   onClick={addCity}
-                  className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                  className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition w-full sm:w-auto"
                 >
                   Добавить
                 </button>
@@ -310,7 +311,7 @@ export default function Onboarding() {
                       <button
                         type="button"
                         onClick={() => removeCity(city)}
-                        className="text-primary hover:text-red-600"
+                        className="text-primary hover:text-red-600 font-bold"
                       >
                         ×
                       </button>
@@ -342,8 +343,8 @@ export default function Onboarding() {
           {/* Заглушки для шагов 5-10 */}
           {step > 4 && step <= 10 && (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4"></div>
-              <h2 className="text-2xl font-semibold mb-2">Шаг {step} в разработке</h2>
+              <div className="text-6xl mb-4">🚧</div>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-2">Шаг {step} в разработке</h2>
               <p className="text-slate-600">
                 Этот шаг будет добавлен в следующей части
               </p>
@@ -351,12 +352,12 @@ export default function Onboarding() {
           )}
 
           {/* Навигация */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-slate-200">
+          <div className="flex flex-col sm:flex-row justify-between gap-3 mt-6 sm:mt-8 pt-6 border-t border-slate-200">
             <button
               type="button"
               onClick={prevStep}
               disabled={step === 1}
-              className="px-6 py-3 rounded-lg font-semibold border-2 border-slate-200 hover:border-slate-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 rounded-lg font-semibold border-2 border-slate-200 hover:border-slate-300 transition disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             >
               ← Назад
             </button>
@@ -365,7 +366,7 @@ export default function Onboarding() {
               <button
                 type="button"
                 onClick={nextStep}
-                className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition w-full sm:w-auto"
               >
                 Далее →
               </button>
@@ -374,7 +375,7 @@ export default function Onboarding() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:bg-slate-400"
+                className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition disabled:bg-slate-400 w-full sm:w-auto"
               >
                 {loading ? 'Сохранение...' : '✅ Сохранить и получить отчёт'}
               </button>
