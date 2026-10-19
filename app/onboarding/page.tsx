@@ -1,8 +1,59 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ChangeEvent, type KeyboardEvent } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+
+type FormData = {
+  desired_roles: string[]
+  min_salary: number
+  salary_type: string
+  work_format: string
+  regions: string[]
+  cities: string[]
+  industries: string[]
+  stop_industries: string[]
+  min_experience_years: number
+  max_experience_years: number
+  must_keywords: string[]
+  exclude_keywords: string[]
+  stop_words: string[]
+  stop_companies: string[]
+  exclude_employment_types: string[]
+  allowed_schedule: string[]
+  allowed_company_size: string[]
+  travel_preference: string
+  freshness_days: number
+  salary_required_only: boolean
+  min_match_score: number
+  sort_by: string
+  sources: string[]
+  user_summary: string
+}
+
+type TagInputProps = {
+  field: keyof FormData
+  input: string
+  setInput: (val: string) => void
+  placeholder: string
+  color?: 'primary' | 'red'
+  addTag: (field: keyof FormData, value: string, setInput: (val: string) => void) => void
+}
+
+type TagListProps = {
+  field: keyof FormData
+  color?: 'blue' | 'red'
+  formData: FormData
+  removeTag: (field: keyof FormData, value: string) => void
+}
+
+type CheckboxGroupProps = {
+  label: string
+  options: string[]
+  field: keyof FormData
+  formData: FormData
+  toggleCheckbox: (field: keyof FormData, value: string) => void
+}
 
 export default function Onboarding() {
   const router = useRouter()
@@ -10,25 +61,24 @@ export default function Onboarding() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Данные формы (соответствуют таблице profiles в Supabase)
-  const [formData, setFormData] = useState({
-    desired_roles: [] as string[],
+  const [formData, setFormData] = useState<FormData>({
+    desired_roles: [],
     min_salary: 0,
     salary_type: 'net',
     work_format: 'any',
-    regions: [] as string[],
-    cities: [] as string[],
-    industries: [] as string[],
-    stop_industries: [] as string[],
+    regions: [],
+    cities: [],
+    industries: [],
+    stop_industries: [],
     min_experience_years: 0,
     max_experience_years: 0,
-    must_keywords: [] as string[],
-    exclude_keywords: [] as string[],
-    stop_words: [] as string[],
-    stop_companies: [] as string[],
-    exclude_employment_types: [] as string[],
-    allowed_schedule: [] as string[],
-    allowed_company_size: [] as string[],
+    must_keywords: [],
+    exclude_keywords: [],
+    stop_words: [],
+    stop_companies: [],
+    exclude_employment_types: [],
+    allowed_schedule: [],
+    allowed_company_size: [],
     travel_preference: 'any',
     freshness_days: 7,
     salary_required_only: false,
@@ -38,7 +88,6 @@ export default function Onboarding() {
     user_summary: '',
   })
 
-  // Временные значения для полей ввода тегов
   const [roleInput, setRoleInput] = useState('')
   const [cityInput, setCityInput] = useState('')
   const [industryInput, setIndustryInput] = useState('')
@@ -50,20 +99,18 @@ export default function Onboarding() {
 
   const totalSteps = 10
 
-  // --- УНИВЕРСАЛЬНЫЕ ХЕНДЛЕРЫ ---
-
-  const addTag = (field: keyof typeof formData, value: string, setInput: (val: string) => void) => {
+  const addTag = (field: keyof FormData, value: string, setInput: (val: string) => void) => {
     if (value.trim() && !(formData[field] as string[]).includes(value.trim())) {
       setFormData({ ...formData, [field]: [...(formData[field] as string[]), value.trim()] })
       setInput('')
     }
   }
 
-  const removeTag = (field: keyof typeof formData, value: string) => {
+  const removeTag = (field: keyof FormData, value: string) => {
     setFormData({ ...formData, [field]: (formData[field] as string[]).filter(item => item !== value) })
   }
 
-  const toggleCheckbox = (field: keyof typeof formData, value: string) => {
+  const toggleCheckbox = (field: keyof FormData, value: string) => {
     const current = formData[field] as string[]
     if (current.includes(value)) {
       setFormData({ ...formData, [field]: current.filter(item => item !== value) })
@@ -74,8 +121,6 @@ export default function Onboarding() {
 
   const nextStep = () => { if (step < totalSteps) setStep(step + 1) }
   const prevStep = () => { if (step > 1) setStep(step - 1) }
-
-  // --- ОТПРАВКА ФОРМЫ ---
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -122,22 +167,21 @@ export default function Onboarding() {
       if (error) throw error
       alert('✅ Профиль успешно сохранен! Ожидайте первый отчёт.')
       router.push('/')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Неизвестная ошибка'
+      setError(message)
     } finally {
       setLoading(false)
     }
   }
 
-  // --- UI КОМПОНЕНТЫ ---
-
-  const TagInput = ({ field, input, setInput, placeholder, color = 'primary' }: any) => (
+  const TagInput = ({ field, input, setInput, placeholder, color = 'primary', addTag }: TagInputProps) => (
     <div className="flex flex-col sm:flex-row gap-2 mb-3 w-full">
       <input
         type="text"
         value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag(field, input, setInput))}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+        onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && (e.preventDefault(), addTag(field, input, setInput))}
         placeholder={placeholder}
         className={`flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:border-transparent outline-none w-full ${color === 'red' ? 'focus:ring-red-500' : 'focus:ring-primary'}`}
       />
@@ -151,7 +195,7 @@ export default function Onboarding() {
     </div>
   )
 
-  const TagList = ({ field, color = 'blue' }: any) => (
+  const TagList = ({ field, color = 'blue', formData, removeTag }: TagListProps) => (
     <div className="flex flex-wrap gap-2">
       {(formData[field] as string[]).map((item) => (
         <span key={item} className={`${color === 'red' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-primary'} px-3 py-1 rounded-full text-sm flex items-center gap-2`}>
@@ -162,11 +206,11 @@ export default function Onboarding() {
     </div>
   )
 
-  const CheckboxGroup = ({ label, options, field }: any) => (
+  const CheckboxGroup = ({ label, options, field, formData, toggleCheckbox }: CheckboxGroupProps) => (
     <div className="mb-4">
-      <label className="block text-sm font-medium text-slate-700 mb-2">{label}</label>
+      {label && <label className="block text-sm font-medium text-slate-700 mb-2">{label}</label>}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {options.map((opt: string) => (
+        {options.map((opt) => (
           <label key={opt} className="flex items-center gap-2 p-2 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">
             <input
               type="checkbox"
@@ -184,7 +228,6 @@ export default function Onboarding() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-8 px-4 sm:py-12">
       <div className="max-w-3xl mx-auto">
-        {/* Прогресс-бар */}
         <div className="mb-6 sm:mb-8">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-slate-600">Шаг {step} из {totalSteps}</span>
@@ -195,28 +238,25 @@ export default function Onboarding() {
           </div>
         </div>
 
-        {/* Карточка формы */}
         <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 border border-slate-200">
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Настройте ваш поиск работы</h1>
           <p className="text-slate-600 mb-6 sm:mb-8">Заполните профиль, чтобы мы могли находить только подходящие вакансии</p>
 
-          {/* ШАГ 1: Должности */}
           {step === 1 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">1. Кем вы хотите работать?</h2>
-              <TagInput field="desired_roles" input={roleInput} setInput={setRoleInput} placeholder="Например: Менеджер проектов" />
-              <TagList field="desired_roles" />
+              <TagInput field="desired_roles" input={roleInput} setInput={setRoleInput} placeholder="Например: Менеджер проектов" addTag={addTag} />
+              <TagList field="desired_roles" formData={formData} removeTag={removeTag} />
             </div>
           )}
 
-          {/* ШАГ 2: Зарплата */}
           {step === 2 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">2. Желаемая зарплата</h2>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Минимальная зарплата (₽)</label>
-                  <input type="number" value={formData.min_salary || ''} onChange={(e) => setFormData({ ...formData, min_salary: parseInt(e.target.value) || 0 })} placeholder="100000" className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+                  <input type="number" value={formData.min_salary || ''} onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, min_salary: parseInt(e.target.value) || 0 })} placeholder="100000" className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Формат зарплаты</label>
@@ -229,7 +269,6 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* ШАГ 3: Формат работы */}
           {step === 3 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">3. Формат работы</h2>
@@ -249,39 +288,36 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* ШАГ 4: География */}
           {step === 4 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">4. География</h2>
-              <TagInput field="cities" input={cityInput} setInput={setCityInput} placeholder="Например: Казань" />
-              <TagList field="cities" />
+              <TagInput field="cities" input={cityInput} setInput={setCityInput} placeholder="Например: Казань" addTag={addTag} />
+              <TagList field="cities" formData={formData} removeTag={removeTag} />
               <div className="mt-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={formData.regions.includes('Вся Россия')} onChange={(e) => setFormData({ ...formData, regions: e.target.checked ? ['Вся Россия'] : [] })} className="w-5 h-5 text-primary rounded focus:ring-primary" />
+                  <input type="checkbox" checked={formData.regions.includes('Вся Россия')} onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, regions: e.target.checked ? ['Вся Россия'] : [] })} className="w-5 h-5 text-primary rounded focus:ring-primary" />
                   <span className="text-slate-700">Рассматриваю всю Россию</span>
                 </label>
               </div>
             </div>
           )}
 
-          {/* ШАГ 5: Отрасли */}
           {step === 5 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">5. Отрасли</h2>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-slate-700 mb-2">Желаемые отрасли</label>
-                <TagInput field="industries" input={industryInput} setInput={setIndustryInput} placeholder="Например: IT, Финансы" />
-                <TagList field="industries" />
+                <TagInput field="industries" input={industryInput} setInput={setIndustryInput} placeholder="Например: IT, Финансы" addTag={addTag} />
+                <TagList field="industries" formData={formData} removeTag={removeTag} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Стоп-отрасли (исключить)</label>
-                <TagInput field="stop_industries" input={stopIndustryInput} setInput={setStopIndustryInput} placeholder="Например: Gambling, МЛМ" color="red" />
-                <TagList field="stop_industries" color="red" />
+                <TagInput field="stop_industries" input={stopIndustryInput} setInput={setStopIndustryInput} placeholder="Например: Gambling, МЛМ" color="red" addTag={addTag} />
+                <TagList field="stop_industries" color="red" formData={formData} removeTag={removeTag} />
               </div>
             </div>
           )}
 
-          {/* ШАГ 6: Опыт работы */}
           {step === 6 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">6. Ваш опыт работы</h2>
@@ -289,90 +325,82 @@ export default function Onboarding() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Минимальный опыт (лет)</label>
-                  <input type="number" min="0" value={formData.min_experience_years || ''} onChange={(e) => setFormData({ ...formData, min_experience_years: parseInt(e.target.value) || 0 })} placeholder="3" className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+                  <input type="number" min="0" value={formData.min_experience_years || ''} onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, min_experience_years: parseInt(e.target.value) || 0 })} placeholder="3" className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Максимальный опыт (лет)</label>
-                  <input type="number" min="0" value={formData.max_experience_years || ''} onChange={(e) => setFormData({ ...formData, max_experience_years: parseInt(e.target.value) || 0 })} placeholder="15" className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
+                  <input type="number" min="0" value={formData.max_experience_years || ''} onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, max_experience_years: parseInt(e.target.value) || 0 })} placeholder="15" className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" />
                 </div>
               </div>
             </div>
           )}
 
-          {/* ШАГ 7: Ключевые слова */}
           {step === 7 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">7. Ключевые слова</h2>
               <div className="mb-6">
                 <label className="block text-sm font-medium text-slate-700 mb-2">Обязательные слова</label>
-                <TagInput field="must_keywords" input={mustKeywordInput} setInput={setMustKeywordInput} placeholder="Например: B2B, CRM, Agile" />
-                <TagList field="must_keywords" />
+                <TagInput field="must_keywords" input={mustKeywordInput} setInput={setMustKeywordInput} placeholder="Например: B2B, CRM, Agile" addTag={addTag} />
+                <TagList field="must_keywords" formData={formData} removeTag={removeTag} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Исключаемые слова</label>
-                <TagInput field="exclude_keywords" input={excludeKeywordInput} setInput={setExcludeKeywordInput} placeholder="Например: junior, стажировка" color="red" />
-                <TagList field="exclude_keywords" color="red" />
+                <TagInput field="exclude_keywords" input={excludeKeywordInput} setInput={setExcludeKeywordInput} placeholder="Например: junior, стажировка" color="red" addTag={addTag} />
+                <TagList field="exclude_keywords" color="red" formData={formData} removeTag={removeTag} />
               </div>
             </div>
           )}
 
-          {/* ШАГ 8: Стоп-фильтры и настройки */}
           {step === 8 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">8. Тонкие настройки и стоп-фильтры</h2>
-              
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Стоп-слова (отсеивать вакансии)</label>
-                  <TagInput field="stop_words" input={stopWordInput} setInput={setStopWordInput} placeholder="Например: продажи, холодный обзвон" color="red" />
-                  <TagList field="stop_words" color="red" />
+                  <TagInput field="stop_words" input={stopWordInput} setInput={setStopWordInput} placeholder="Например: продажи, холодный обзвон" color="red" addTag={addTag} />
+                  <TagList field="stop_words" color="red" formData={formData} removeTag={removeTag} />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Стоп-компании</label>
-                  <TagInput field="stop_companies" input={stopCompanyInput} setInput={setStopCompanyInput} placeholder="Название компании" color="red" />
-                  <TagList field="stop_companies" color="red" />
+                  <TagInput field="stop_companies" input={stopCompanyInput} setInput={setStopCompanyInput} placeholder="Название компании" color="red" addTag={addTag} />
+                  <TagList field="stop_companies" color="red" formData={formData} removeTag={removeTag} />
                 </div>
-
-                <CheckboxGroup label="Допустимые типы занятости" options={['Полная занятость', 'Частичная занятость', 'Проектная работа', 'Стажировка']} field="exclude_employment_types" />
-                
-                <CheckboxGroup label="График работы" options={['Полный день', 'Гибкий график', 'Сменный график', 'Вахта']} field="allowed_schedule" />
-
-                <CheckboxGroup label="Размер компании" options={['Малый бизнес (до 50)', 'Средний (50-500)', 'Крупный (500+)', 'Корпорации / Гос']} field="allowed_company_size" />
-
+                <CheckboxGroup label="Допустимые типы занятости" options={['Полная занятость', 'Частичная занятость', 'Проектная работа', 'Стажировка']} field="exclude_employment_types" formData={formData} toggleCheckbox={toggleCheckbox} />
+                <CheckboxGroup label="График работы" options={['Полный день', 'Гибкий график', 'Сменный график', 'Вахта']} field="allowed_schedule" formData={formData} toggleCheckbox={toggleCheckbox} />
+                <CheckboxGroup label="Размер компании" options={['Малый бизнес (до 50)', 'Средний (50-500)', 'Крупный (500+)', 'Корпорации / Гос']} field="allowed_company_size" formData={formData} toggleCheckbox={toggleCheckbox} />
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Отношение к командировкам</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {['any', 'no_travel', 'rare_ok', 'frequent_ok'].map((val) => (
-                      <label key={val} className="flex items-center gap-2 p-2 border border-slate-200 rounded-lg cursor-pointer">
-                        <input type="radio" name="travel" checked={formData.travel_preference === val} onChange={() => setFormData({ ...formData, travel_preference: val })} className="w-4 h-4 text-primary" />
-                        <span className="text-sm">
-                          {val === 'any' ? 'Не важно' : val === 'no_travel' ? 'Без командировок' : val === 'rare_ok' ? 'Редкие допустимы' : 'Частые допустимы'}
-                        </span>
+                    {[
+                      { val: 'any', label: 'Не важно' },
+                      { val: 'no_travel', label: 'Без командировок' },
+                      { val: 'rare_ok', label: 'Редкие допустимы' },
+                      { val: 'frequent_ok', label: 'Частые допустимы' }
+                    ].map((item) => (
+                      <label key={item.val} className="flex items-center gap-2 p-2 border border-slate-200 rounded-lg cursor-pointer">
+                        <input type="radio" name="travel" checked={formData.travel_preference === item.val} onChange={() => setFormData({ ...formData, travel_preference: item.val })} className="w-4 h-4 text-primary" />
+                        <span className="text-sm">{item.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Свежесть вакансий (дней)</label>
-                    <input type="number" value={formData.freshness_days} onChange={(e) => setFormData({ ...formData, freshness_days: parseInt(e.target.value) || 7 })} className="w-full px-4 py-3 border border-slate-300 rounded-lg" />
+                    <input type="number" value={formData.freshness_days} onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, freshness_days: parseInt(e.target.value) || 7 })} className="w-full px-4 py-3 border border-slate-300 rounded-lg" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Мин. порог совпадения (%)</label>
-                    <input type="number" min="0" max="100" value={formData.min_match_score} onChange={(e) => setFormData({ ...formData, min_match_score: parseInt(e.target.value) || 60 })} className="w-full px-4 py-3 border border-slate-300 rounded-lg" />
+                    <input type="number" min="0" max="100" value={formData.min_match_score} onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, min_match_score: parseInt(e.target.value) || 60 })} className="w-full px-4 py-3 border border-slate-300 rounded-lg" />
                   </div>
                 </div>
-
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" id="salary_req" checked={formData.salary_required_only} onChange={(e) => setFormData({ ...formData, salary_required_only: e.target.checked })} className="w-5 h-5 text-primary rounded" />
+                  <input type="checkbox" id="salary_req" checked={formData.salary_required_only} onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, salary_required_only: e.target.checked })} className="w-5 h-5 text-primary rounded" />
                   <label htmlFor="salary_req" className="text-slate-700 cursor-pointer">Показывать только вакансии с указанной зарплатой</label>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Сортировка в отчете</label>
-                  <select value={formData.sort_by} onChange={(e) => setFormData({ ...formData, sort_by: e.target.value })} className="w-full px-4 py-3 border border-slate-300 rounded-lg">
+                  <select value={formData.sort_by} onChange={(e: ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, sort_by: e.target.value })} className="w-full px-4 py-3 border border-slate-300 rounded-lg">
                     <option value="score">По совпадению (рекомендуется)</option>
                     <option value="date">По дате публикации</option>
                     <option value="salary">По зарплате</option>
@@ -382,19 +410,10 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* ШАГ 9: Источники */}
           {step === 9 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">9. Источники вакансий</h2>
               <p className="text-slate-600 mb-6">Выберите площадки, откуда мы будем собирать вакансии</p>
-              <CheckboxGroup label="" options={[
-                { id: 'hh', name: 'hh.ru' },
-                { id: 'superjob', name: 'SuperJob' },
-                { id: 'habr', name: 'Хабр Карьера' },
-                { id: 'rabota', name: 'Rabota.ru' },
-                { id: 'trudvsem', name: 'trudvsem.ru (Работа в России)' }
-              ].map(s => s.name)} field="sources" /> 
-              {/* Note: for simplicity in this UI, we map names, but in real app we'd map IDs. Let's fix the toggle for sources to use IDs */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
                   { id: 'hh', name: 'hh.ru' },
@@ -417,14 +436,13 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* ШАГ 10: Расскажите о себе */}
           {step === 10 && (
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold mb-4">10. Расскажите о себе</h2>
               <p className="text-slate-600 mb-4">Опишите свой опыт и ключевые навыки. Это поможет AI генерировать точные отклики.</p>
               <textarea
                 value={formData.user_summary}
-                onChange={(e) => setFormData({ ...formData, user_summary: e.target.value })}
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, user_summary: e.target.value })}
                 rows={6}
                 maxLength={1000}
                 placeholder="Например: 10 лет в IT, управление командами до 15 человек, опыт в B2B-проектах. Навыки: Agile, Jira, бюджетирование. Достижения: увеличил конверсию на 30%."
@@ -434,7 +452,6 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Навигация */}
           <div className="flex flex-col sm:flex-row justify-between gap-3 mt-6 sm:mt-8 pt-6 border-t border-slate-200">
             <button type="button" onClick={prevStep} disabled={step === 1} className="px-6 py-3 rounded-lg font-semibold border-2 border-slate-200 hover:border-slate-300 transition disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto">← Назад</button>
             {step < totalSteps ? (
