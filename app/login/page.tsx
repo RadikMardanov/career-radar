@@ -11,12 +11,10 @@ export default function Login() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
-  // Проверяем, авторизован ли пользователь при загрузке
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        // Если уже авторизован — сразу на онбординг
         router.push('/onboarding')
       }
     }
@@ -29,17 +27,18 @@ export default function Login() {
     setMessage('')
     setError('')
 
+    // ВАЖНО: редирект на /auth/callback, а не на /onboarding
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/onboarding`,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
 
     if (error) {
       setError(error.message)
     } else {
-      setMessage('✅ Ссылка для входа отправлена на вашу почту! Проверьте inbox.')
+      setMessage('✅ Ссылка для входа отправлена на вашу почту! Проверьте inbox (и папку "Спам").')
     }
 
     setLoading(false)
@@ -75,7 +74,7 @@ export default function Login() {
             disabled={loading}
             className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-slate-400"
           >
-            {loading ? 'Отправка...' : ' Получить ссылку для входа'}
+            {loading ? 'Отправка...' : '🔗 Получить ссылку для входа'}
           </button>
         </form>
 
