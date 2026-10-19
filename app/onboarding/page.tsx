@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, type ChangeEvent, type KeyboardEvent } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import type { ChangeEvent, KeyboardEvent } from 'react'
 
 type FormData = {
   desired_roles: string[]
@@ -36,6 +37,7 @@ export default function Onboarding() {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [checkingAuth, setCheckingAuth] = useState(true)
 
   const [formData, setFormData] = useState<FormData>({
     desired_roles: [],
@@ -75,6 +77,19 @@ export default function Onboarding() {
 
   const totalSteps = 10
 
+  // Проверка авторизации при загрузке
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/login')
+      } else {
+        setCheckingAuth(false)
+      }
+    }
+    checkAuth()
+  }, [router])
+
   const addTag = (field: keyof FormData, value: string, setInput: (val: string) => void) => {
     if (value.trim() && !(formData[field] as string[]).includes(value.trim())) {
       setFormData({ ...formData, [field]: [...(formData[field] as string[]), value.trim()] })
@@ -107,6 +122,7 @@ export default function Onboarding() {
       if (!user) {
         setError('Пользователь не авторизован. Пожалуйста, войдите снова.')
         setLoading(false)
+        router.push('/login')
         return
       }
 
@@ -151,7 +167,6 @@ export default function Onboarding() {
     }
   }
 
-  // Вспомогательные функции для рендера тегов
   const renderTags = (field: keyof FormData, color: 'blue' | 'red' = 'blue') => (
     <div className="flex flex-wrap gap-2">
       {(formData[field] as string[]).map((item) => (
@@ -162,6 +177,18 @@ export default function Onboarding() {
       ))}
     </div>
   )
+
+  // Показываем загрузку во время проверки авторизации
+  if (checkingAuth) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🔄</div>
+          <p className="text-slate-600">Проверка авторизации...</p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-8 px-4 sm:py-12">
@@ -404,7 +431,6 @@ export default function Onboarding() {
                   {renderTags('stop_companies', 'red')}
                 </div>
 
-                {/* Типы занятости */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-slate-700 mb-2">Допустимые типы занятости</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -417,7 +443,6 @@ export default function Onboarding() {
                   </div>
                 </div>
 
-                {/* График работы */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-slate-700 mb-2">График работы</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -430,7 +455,6 @@ export default function Onboarding() {
                   </div>
                 </div>
 
-                {/* Размер компании */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-slate-700 mb-2">Размер компании</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -443,7 +467,6 @@ export default function Onboarding() {
                   </div>
                 </div>
 
-                {/* Командировки */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Отношение к командировкам</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -461,7 +484,6 @@ export default function Onboarding() {
                   </div>
                 </div>
 
-                {/* Свежесть и порог */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Свежесть вакансий (дней)</label>
@@ -473,13 +495,11 @@ export default function Onboarding() {
                   </div>
                 </div>
 
-                {/* Только с зарплатой */}
                 <div className="flex items-center gap-2">
                   <input type="checkbox" id="salary_req" checked={formData.salary_required_only} onChange={(e: ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, salary_required_only: e.target.checked })} className="w-5 h-5 text-primary rounded" />
                   <label htmlFor="salary_req" className="text-slate-700 cursor-pointer">Показывать только вакансии с указанной зарплатой</label>
                 </div>
 
-                {/* Сортировка */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Сортировка в отчете</label>
                   <select value={formData.sort_by} onChange={(e: ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, sort_by: e.target.value })} className="w-full px-4 py-3 border border-slate-300 rounded-lg">
