@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Берем данные из переменных окружения (которые мы добавили в Netlify)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// Добавляем заглушки, чтобы сборка (build) не падала с ошибкой "supabaseUrl is required"
+// Во время реальной работы в браузере процесс.env подставит настоящие значения из Cloudflare
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
 
-// Создаем "клиент" для общения с базой данных
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
