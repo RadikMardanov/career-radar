@@ -158,7 +158,8 @@ export default function Onboarding() {
 
       if (error) throw error
       alert('✅ Профиль успешно сохранен! Ожидайте первый отчёт.')
-      router.push('/')
+      // ✅ ИЗМЕНЕНИЕ: редирект в личный кабинет вместо лендинга
+      router.push('/dashboard')
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Неизвестная ошибка'
       setError(message)
@@ -260,7 +261,7 @@ export default function Onboarding() {
                 {[
                   { value: 'remote', label: '🏠 Удалённо', desc: 'Полностью удаленная работа' },
                   { value: 'hybrid', label: '🔄 Гибрид', desc: 'Частично офис, частично удаленно' },
-                  { value: 'office', label: '🏢 Офис', desc: 'Работа в офисе' },
+                  { value: 'office', label: ' Офис', desc: 'Работа в офисе' },
                   { value: 'any', label: '✨ Любой', desc: 'Не имеет значения' },
                 ].map((option) => (
                   <button key={option.value} type="button" onClick={() => setFormData({ ...formData, work_format: option.value })} className={`p-4 rounded-lg border-2 text-left transition ${formData.work_format === option.value ? 'border-primary bg-blue-50' : 'border-slate-200'}`}>
