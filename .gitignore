@@ -28,7 +28,7 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# Vercel / Cloudflare artifacts (на всякий случай, чтобы не вернулись)
+# Vercel / Cloudflare artifacts
 .vercel
 .wrangler
 .open-next
