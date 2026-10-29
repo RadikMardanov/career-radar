@@ -5,7 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   // ⚠️ КРИТИЧНО ДЛЯ GITHUB PAGES:
-  // Указываем точное имя репозитория как префикс всех путей.
-  // Это гарантирует, что ассеты будут искаться по адресу /career-radar/assets/...
-  base: '/career-radar/', 
+  // Используем относительный путь './', чтобы избежать двойного префикса /repo-name/repo-name/
+  base: './', 
 })
