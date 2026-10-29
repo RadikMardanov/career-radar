@@ -2,13 +2,14 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!-- Явно указываем полный путь с префиксом /career-radar/, чтобы обойти кэш -->
+    <link rel="icon" type="image/svg+xml" href="/career-radar/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Карьерный радар</title>
   </head>
   <body>
     <div id="root"></div>
-    <!-- Правильный путь для Vite: относительный от корня проекта -->
+    <!-- Путь к скрипту должен быть относительным от корня проекта; Vite сам добавит base при сборке -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
