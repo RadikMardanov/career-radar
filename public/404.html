@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+        // Сохраняем текущий URL (например, /career-radar/login)
+        var redirectPath = window.location.pathname;
+        
+        // Перенаправляем на корень приложения, передавая исходный путь как параметр
+        // Это позволит React Router восстановить правильную страницу после загрузки
+        window.location.replace('/career-radar/?redirect=' + encodeURIComponent(redirectPath));
+    </script>
+</head>
+<body>
+    <p>Перенаправление...</p>
+</body>
+</html>
